@@ -73,7 +73,12 @@ async def create_run(request: RunRequest) -> dict[str, Any]:
 
 @router.get("/{run_id}/events")
 async def run_events(run_id: str, token: str):
-    oidc_token = await get_vercel_oidc_token()
+    oidc_token = None
+    try:
+        oidc_token = await get_vercel_oidc_token()
+    except Exception:
+        pass
+
     token_payload = read_stream_token(token)
     if token_payload.get("run_id") != run_id:
         raise HTTPException(status_code=400, detail="Token does not match run id")
@@ -105,7 +110,12 @@ async def run_events(run_id: str, token: str):
 
 @router.get("/{run_id}/resume")
 async def resume_run(run_id: str, token: str, result: str):
-    oidc_token = await get_vercel_oidc_token()
+    oidc_token = None
+    try:
+        oidc_token = await get_vercel_oidc_token()
+    except Exception:
+        pass
+
     token_payload = read_stream_token(token)
     if token_payload.get("run_id") != run_id:
         raise HTTPException(status_code=400, detail="Token does not match run id")
