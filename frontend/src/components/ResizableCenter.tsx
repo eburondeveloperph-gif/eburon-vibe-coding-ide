@@ -1,5 +1,9 @@
 "use client";
 
+import React from 'react'
+import { EditorPane } from './Editor/EditorPane'
+import { TerminalPane } from './Editor/TerminalPane'
+import StatusBar from './Editor/StatusBar'
 import { ResponsivePreview } from './ResponsivePreview'
 import { Play } from 'lucide-react'
 
