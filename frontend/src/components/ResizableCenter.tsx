@@ -128,13 +128,13 @@ const ResizableCenter: React.FC<ResizableCenterProps> = ({
           }
           showPreview={showPreview}
           onTogglePreview={() => setShowPreview(!showPreview)}
-          hasPreview={!!previewUrl}
+          hasPreview={true}
         />
         
-        {showPreview && previewUrl && (
+        {showPreview && (
           <div className="absolute inset-0 z-50 flex flex-col bg-white">
             <ResponsivePreview 
-              url={previewUrl} 
+              url={previewUrl || ''} 
               refreshToken={previewRefreshToken} 
               onClose={() => setShowPreview(false)}
             />

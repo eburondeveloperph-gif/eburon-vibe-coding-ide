@@ -93,23 +93,33 @@ export const ResponsivePreview: React.FC<{
 
       {/* Viewport */}
       <div className="flex-1 overflow-auto bg-gray-900 p-4 flex justify-center">
-        <div 
-          className="bg-white shadow-2xl transition-all duration-300 ease-in-out h-full"
-          style={{ 
-            width: getWidth(),
-            borderRadius: device === 'web' ? '0' : '12px',
-            overflow: 'hidden',
-            border: device === 'web' ? 'none' : '8px solid #333'
-          }}
-        >
-          <iframe
-            key={`preview-frame-${reloadCount}`}
-            src={url}
-            title="App Preview"
-            className="w-full h-full border-none"
-            style={{ colorScheme: 'light' }}
-          />
-        </div>
+        {!url ? (
+          <div className="flex flex-col items-center justify-center text-gray-400 gap-4">
+            <Monitor className="w-16 h-16 opacity-20" />
+            <div className="text-center">
+              <p className="text-lg font-medium">No active preview</p>
+              <p className="text-sm opacity-60 max-w-xs">Run your code or ask the agent to start the application to see the live view here.</p>
+            </div>
+          </div>
+        ) : (
+          <div 
+            className="bg-white shadow-2xl transition-all duration-300 ease-in-out h-full"
+            style={{ 
+              width: getWidth(),
+              borderRadius: device === 'web' ? '0' : '12px',
+              overflow: 'hidden',
+              border: device === 'web' ? 'none' : '8px solid #333'
+            }}
+          >
+            <iframe
+              key={`preview-frame-${reloadCount}`}
+              src={url}
+              title="App Preview"
+              className="w-full h-full border-none"
+              style={{ colorScheme: 'light' }}
+            />
+          </div>
+        )}
       </div>
     </div>
   )
