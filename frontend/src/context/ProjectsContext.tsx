@@ -15,7 +15,7 @@ import { getUserId } from '../lib/user'
 
 export type ProjectTab = { id: string; name: string }
 
-type ProjectState = {
+interface ProjectState {
   files: Record<string, string>
   proposals: Record<string, string>
   activeFile: string
@@ -28,8 +28,11 @@ type ProjectState = {
   activeThreadId: string | null
   templateId: string
   sandbox: SandboxState
-  autoSyncing?: boolean
+  autoSyncing: boolean
+  previewUrl: string | null
+  previewRefreshToken: number
 }
+
 
 type ProjectsContextValue = {
   // project tabs
@@ -109,6 +112,12 @@ type ProjectsContextValue = {
   setAutoSyncing: (v: boolean) => void
   // manual immediate sync
   syncSandboxNow: () => Promise<boolean>
+
+  // preview
+  previewUrl: string | null
+  setPreviewUrl: (url: string | null) => void
+  previewRefreshToken: number
+  refreshPreview: () => void
 }
 
 const ProjectsContext = React.createContext<ProjectsContextValue | null>(null)
@@ -227,6 +236,8 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
           model: s?.model || 'xai/grok-4',
           activeThreadId: null,
           templateId: inferredTemplateId,
+          previewUrl: s?.previewUrl || null,
+          previewRefreshToken: 0,
           sandbox: {
             sandboxId: s?.sandbox?.sandboxId,
             lastEditorSync: s?.sandbox?.lastEditorSync,
@@ -250,6 +261,8 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
             templateId: defaultTemplateId,
             sandbox: {},
             autoSyncing: false,
+            previewUrl: null,
+            previewRefreshToken: 0,
           }
         }
       }
@@ -270,6 +283,8 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
         templateId: defaultTemplateId,
         sandbox: {},
         autoSyncing: false,
+        previewUrl: null,
+        previewRefreshToken: 0,
       },
     } as Record<string, ProjectState>
     return initial
@@ -317,6 +332,7 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
         expandedFolders: st.expandedFolders,
         model: st.model,
         templateId: st.templateId,
+        previewUrl: st.previewUrl,
         sandbox: st.sandbox
           ? {
               sandboxId: st.sandbox.sandboxId,
@@ -359,6 +375,8 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
           activeThreadId: null,
           templateId: defaultTemplateId,
           sandbox: {},
+          previewUrl: null,
+          previewRefreshToken: 0,
         } as ProjectState
         return next
       })
@@ -394,6 +412,8 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
       activeThreadId: null,
       templateId: defaultTemplateId,
       sandbox: {},
+      previewUrl: null,
+      previewRefreshToken: 0,
     } as ProjectState)
 
   const setProject = React.useCallback(
@@ -517,6 +537,26 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
     },
     [activeProjectId]
   )
+
+  const setPreviewUrl = React.useCallback(
+    (url: string | null) => {
+      setProjectStates((prev) => ({
+        ...prev,
+        [activeProjectId]: { ...prev[activeProjectId], previewUrl: url },
+      }))
+    },
+    [activeProjectId]
+  )
+
+  const refreshPreview = React.useCallback(() => {
+    setProjectStates((prev) => ({
+      ...prev,
+      [activeProjectId]: {
+        ...prev[activeProjectId],
+        previewRefreshToken: (prev[activeProjectId].previewRefreshToken || 0) + 1,
+      },
+    }))
+  }, [activeProjectId])
 
   // Expose helpers to update sandbox snapshots; these must be defined before any
   // callbacks that reference them (e.g., syncSandboxNow) to avoid TDZ issues.
@@ -1126,6 +1166,8 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
           activeThreadId: null,
           templateId,
           sandbox: {},
+          previewUrl: null,
+          previewRefreshToken: 0,
         },
       }))
       setActiveProjectId(id)
@@ -1285,6 +1327,10 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
     autoSyncing: Boolean(activeState.autoSyncing),
     setAutoSyncing,
     syncSandboxNow,
+    previewUrl: activeState.previewUrl,
+    setPreviewUrl,
+    previewRefreshToken: activeState.previewRefreshToken,
+    refreshPreview,
   }
 
   return (

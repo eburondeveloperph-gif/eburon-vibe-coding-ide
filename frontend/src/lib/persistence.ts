@@ -7,6 +7,7 @@ export type PersistedProjectState = {
   expandedFolders?: string[]
   model?: string
   templateId?: string
+  previewUrl?: string | null
   // Persist sandbox snapshot metadata only (omit large caches like lastData)
   sandbox?: Omit<SandboxState, 'lastData' | 'shouldSyncOnNextRun'>
 }

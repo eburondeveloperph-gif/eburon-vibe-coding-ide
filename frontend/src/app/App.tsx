@@ -78,9 +78,12 @@ function App() {
     deleteProject,
     upsertFileIfMissing,
     createProject,
+    previewUrl,
+    setPreviewUrl,
+    previewRefreshToken,
+    refreshPreview,
   } = useProjects()
   const [showNewProject, setShowNewProject] = useState<boolean>(false)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   // Empty projects state flag (used for conditional rendering)
   const isNoProjects = projects.length === 0
@@ -260,7 +263,7 @@ function App() {
   )
   const handleAgentEvent = useAgentEvents({
     onRefreshPreview: () => {
-      setPreviewRefreshToken((t) => t + 1)
+      refreshPreview()
     },
     onSetPreviewUrl: (url) => {
       setPreviewUrl(url)
@@ -283,9 +286,6 @@ function App() {
       !latestRunHasFinalAnswer &&
       (latestRunConnected || latestRunStatus === 'waiting_exec')
   )
-
-  // Token to force refresh of preview iframes
-  const [previewRefreshToken, setPreviewRefreshToken] = useState<number>(0)
 
   // Initialize chat functionality
   const { sendPrompt, cancelCurrentTask } = useChat({
