@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React from 'react'
 import Editor, { DiffEditor, useMonaco } from '@monaco-editor/react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Play, Layout } from 'lucide-react'
 import type * as monaco from 'monaco-editor'
 import { useProjects } from '../../context/ProjectsContext'
 import { API_BASE } from '../../constants'
@@ -35,6 +35,10 @@ interface EditorPaneProps {
   proposedFiles?: string[]
   // Navigate to another proposed file
   onNavigateProposedFile?: (path: string) => void
+  // Preview controls
+  showPreview?: boolean
+  onTogglePreview?: () => void
+  hasPreview?: boolean
 }
 
 export const EditorPane: React.FC<EditorPaneProps> = ({
@@ -48,6 +52,9 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
   onRequestCodeFix,
   proposedFiles,
   onNavigateProposedFile,
+  showPreview,
+  onTogglePreview,
+  hasPreview,
 }) => {
   const diffEditorRef = React.useRef<DiffEditorRef>(null)
   const editorRef = React.useRef<monaco.editor.IStandaloneCodeEditor | null>(
@@ -512,17 +519,30 @@ export const EditorPane: React.FC<EditorPaneProps> = ({
         >
           {fileName}
         </div>
-        {/* {isOutOfSync && (
+        
+        {hasPreview && (
           <button
-            onClick={handleImmediateSync}
-            className="px-2 py-1 rounded-sm text-xs cursor-pointer"
-            style={{ background: syncing ? 'var(--vscode-surface)' : 'var(--vscode-accent)', color: syncing ? 'var(--vscode-text)' : '#ffffff', border: '1px solid var(--vscode-panel-border)' }}
-            disabled={syncing}
-            title={'Push editor changes to the running sandbox now'}
+            onClick={onTogglePreview}
+            className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-semibold transition-all shadow-sm ${
+              showPreview 
+                ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                : 'bg-green-600 text-white hover:bg-green-700'
+            }`}
+            title={showPreview ? "Close App Preview" : "Open App Preview"}
           >
-            {syncing ? 'Syncing…' : 'Sync sandbox'}
+            {showPreview ? (
+              <>
+                <Layout className="w-3.5 h-3.5" />
+                <span>Editor</span>
+              </>
+            ) : (
+              <>
+                <Play className="w-3.5 h-3.5 fill-current" />
+                <span>Preview</span>
+              </>
+            )}
           </button>
-        )} */}
+        )}
       </div>
       <div className="flex-1 min-h-0 overflow-hidden relative">
         {isImage ? (

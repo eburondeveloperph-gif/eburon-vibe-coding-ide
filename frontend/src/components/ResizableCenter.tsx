@@ -126,6 +126,9 @@ const ResizableCenter: React.FC<ResizableCenterProps> = ({
           onNavigateProposedFile={(path) =>
             onSelectFile((path || '').replace(/^\//, ''))
           }
+          showPreview={showPreview}
+          onTogglePreview={() => setShowPreview(!showPreview)}
+          hasPreview={!!previewUrl}
         />
         
         {showPreview && previewUrl && (
@@ -165,19 +168,6 @@ const ResizableCenter: React.FC<ResizableCenterProps> = ({
           column={status.column}
           language={status.language}
         />
-        {/* Custom Status Bar addition for Preview */}
-        <div 
-          className="fixed bottom-0 left-[50%] -translate-x-1/2 flex items-center h-[var(--statusbar-height)] z-[100001]"
-        >
-          <button
-            onClick={() => setShowPreview(!showPreview)}
-            className={`flex items-center gap-1 px-3 h-[var(--statusbar-height)] text-xs transition-colors ${showPreview ? 'bg-blue-600 text-white' : 'hover:bg-gray-700 text-gray-300'}`}
-            title="Toggle App Preview"
-          >
-            <Play className={`w-3 h-3 ${showPreview ? 'fill-current' : ''}`} />
-            <span>{showPreview ? 'Close Preview' : 'Preview'}</span>
-          </button>
-        </div>
       </div>
 
       {resizing && (
