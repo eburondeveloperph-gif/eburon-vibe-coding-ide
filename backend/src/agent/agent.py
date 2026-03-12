@@ -76,7 +76,17 @@ def create_ide_agent(model: str | None = None, oidc_token: str | None = None) ->
 
     if model:
         try:
-            formatted_model = f"litellm/vercel_ai_gateway/{model}"
+            if model.startswith("ollama/"):
+                # Format: "ollama/<model_name>"
+                model_name = model.replace("ollama/", "", 1)
+                formatted_model = f"ollama/{model_name}"
+            elif model.startswith("zen/"):
+                # Zen models likely use a similar provider prefix
+                model_name = model.replace("zen/", "", 1)
+                formatted_model = f"openai/{model_name}" # Or whatever Zen expects
+            else:
+                formatted_model = f"litellm/vercel_ai_gateway/{model}"
+            
             return Agent(**base_kwargs, model=formatted_model)
         except TypeError:
             return Agent(**base_kwargs)

@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback } from 'react'
 import type { Action } from '../types/run'
 import { useRuns } from '../context/RunContext'

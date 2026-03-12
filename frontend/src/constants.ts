@@ -25,7 +25,7 @@ export const API_BASE = (() => {
 
 // Prefer a direct SSE origin to avoid proxy buffering (e.g., Next rewrites can buffer SSE)
 // If NEXT_PUBLIC_SSE_ORIGIN is not set, try to infer it from API_BASE when absolute;
-// otherwise, in local dev fall back to the backend default port :8081.
+// otherwise, in local dev fall back to the backend default port :8855.
 export const SSE_ORIGIN = (() => {
   const explicit = (env.NEXT_PUBLIC_SSE_ORIGIN || '').trim()
   if (explicit) return explicit.replace(/\/?$/, '')
@@ -45,7 +45,7 @@ export const SSE_ORIGIN = (() => {
   }
   if (typeof window !== 'undefined') {
     const { protocol, hostname } = window.location
-    // If running locally or via LAN/IP, prefer direct backend default port 8081
+    // If running locally or via LAN/IP, prefer direct backend default port 8855
     const isLocalHost =
       hostname === 'localhost' ||
       hostname === '127.0.0.1' ||
@@ -55,7 +55,7 @@ export const SSE_ORIGIN = (() => {
     )
     const isIp = /^(\d{1,3}\.){3}\d{1,3}$/.test(hostname)
     if (isLocalHost || isPrivateIp || isIp) {
-      return `${protocol}//${hostname}:8081`
+      return `${protocol}//${hostname}:8855`
     }
   }
   return ''

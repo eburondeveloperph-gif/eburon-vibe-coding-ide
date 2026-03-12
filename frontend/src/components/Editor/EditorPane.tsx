@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable @next/next/no-img-element */
 import React from 'react'
 import Editor, { DiffEditor, useMonaco } from '@monaco-editor/react'

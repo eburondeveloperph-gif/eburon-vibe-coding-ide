@@ -1,3 +1,5 @@
+"use client";
+
 import { useRef, useMemo, useCallback } from 'react'
 import { API_BASE, SSE_ORIGIN } from '../constants'
 import type { AgentEvent } from '../types'

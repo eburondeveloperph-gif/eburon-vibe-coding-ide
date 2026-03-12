@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react'
 import { FilePlus, FolderPlus } from '@geist-ui/icons'
 import {

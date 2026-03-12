@@ -1,7 +1,7 @@
-import React from 'react'
-import { EditorPane } from './Editor/EditorPane'
-import { TerminalPane } from './Editor/TerminalPane'
-import StatusBar from './Editor/StatusBar'
+"use client";
+
+import { ResponsivePreview } from './ResponsivePreview'
+import { Play } from 'lucide-react'
 
 type ResizableCenterProps = {
   code: string
@@ -19,6 +19,8 @@ type ResizableCenterProps = {
     selectedCode: string
   }) => void
   isIgnored?: (path: string) => boolean
+  previewUrl?: string | null
+  previewRefreshToken?: number
 }
 
 const ResizableCenter: React.FC<ResizableCenterProps> = ({
@@ -32,10 +34,13 @@ const ResizableCenter: React.FC<ResizableCenterProps> = ({
   onClearLogs,
   onRequestCodeFix,
   isIgnored,
+  previewUrl,
+  previewRefreshToken,
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null)
   const [terminalHeight, setTerminalHeight] = React.useState<number>(200)
   const [resizing, setResizing] = React.useState<boolean>(false)
+  const [showPreview, setShowPreview] = React.useState<boolean>(false)
   const [status, setStatus] = React.useState<{
     line: number
     column: number
@@ -84,7 +89,7 @@ const ResizableCenter: React.FC<ResizableCenterProps> = ({
 
   return (
     <div ref={containerRef} className="flex-1 flex flex-col min-h-0 relative">
-      <div className="flex-1 min-h-0 flex flex-col">
+      <div className="flex-1 min-h-0 flex flex-col relative">
         <EditorPane
           code={code}
           setCode={(v) => setCode(v)}
@@ -118,6 +123,16 @@ const ResizableCenter: React.FC<ResizableCenterProps> = ({
             onSelectFile((path || '').replace(/^\//, ''))
           }
         />
+        
+        {showPreview && previewUrl && (
+          <div className="absolute inset-0 z-50 flex flex-col bg-white">
+            <ResponsivePreview 
+              url={previewUrl} 
+              refreshToken={previewRefreshToken} 
+              onClose={() => setShowPreview(false)}
+            />
+          </div>
+        )}
       </div>
       {terminalLogs && terminalLogs.length > 0 ? (
         <>
@@ -139,11 +154,28 @@ const ResizableCenter: React.FC<ResizableCenterProps> = ({
           />
         </>
       ) : null}
-      <StatusBar
-        line={status.line}
-        column={status.column}
-        language={status.language}
-      />
+      
+      <div className="flex flex-col">
+        <StatusBar
+          line={status.line}
+          column={status.column}
+          language={status.language}
+        />
+        {/* Custom Status Bar addition for Preview */}
+        <div 
+          className="fixed bottom-0 left-[50%] -translate-x-1/2 flex items-center h-[var(--statusbar-height)] z-[100001]"
+        >
+          <button
+            onClick={() => setShowPreview(!showPreview)}
+            className={`flex items-center gap-1 px-3 h-[var(--statusbar-height)] text-xs transition-colors ${showPreview ? 'bg-blue-600 text-white' : 'hover:bg-gray-700 text-gray-300'}`}
+            title="Toggle App Preview"
+          >
+            <Play className={`w-3 h-3 ${showPreview ? 'fill-current' : ''}`} />
+            <span>{showPreview ? 'Close Preview' : 'Preview'}</span>
+          </button>
+        </div>
+      </div>
+
       {resizing && (
         <div
           className="fixed inset-0"

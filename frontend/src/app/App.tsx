@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useState } from 'react'
 import JSZipLib from 'jszip'
 import { useAgentStream } from '../hooks/useAgentStream'
@@ -78,6 +80,7 @@ function App() {
     createProject,
   } = useProjects()
   const [showNewProject, setShowNewProject] = useState<boolean>(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   // Empty projects state flag (used for conditional rendering)
   const isNoProjects = projects.length === 0
@@ -259,6 +262,9 @@ function App() {
     onRefreshPreview: () => {
       setPreviewRefreshToken((t) => t + 1)
     },
+    onSetPreviewUrl: (url) => {
+      setPreviewUrl(url)
+    },
     isActiveRun,
   })
   const stream = useAgentStream({ onMessage: handleAgentEvent })
@@ -344,6 +350,8 @@ function App() {
   return (
     <>
       <ThreePane
+        initialLeftWidth={420}
+        initialRightWidth={260}
         header={
           <ProjectTabs
             projects={projects}
@@ -403,81 +411,6 @@ function App() {
           />
         }
         left={
-          isNoProjects ? (
-            <div
-              className="p-4 text-sm"
-              style={{ color: 'var(--vscode-muted)' }}
-            >
-              No project. Create a new one to get started.
-            </div>
-          ) : (
-            <FileTree
-              project={projectForTree}
-              activeFile={activeFile}
-              onSelect={setActiveFile}
-              onCreateFile={(name) => {
-                createFile(name)
-              }}
-              onCreateFolder={(folderPath) => {
-                createFolder(folderPath)
-              }}
-              onRename={(oldPath, newPath) => {
-                renameFile(oldPath, newPath)
-              }}
-              onDelete={(path) => {
-                deleteFile(path)
-              }}
-              onMoveFile={(src, destDir) => {
-                moveFile(src, destDir)
-              }}
-              onMoveFolder={(srcFolder, destDir) => {
-                moveFolder(srcFolder, destDir)
-              }}
-              proposed={proposalsForTree}
-              folders={folders}
-              expandedPaths={expandedFolders}
-              onExpandedChange={setExpandedFolders}
-              onRenameFolder={(oldPath, newPath) => {
-                renameFolder(oldPath, newPath)
-              }}
-              onDeleteFolder={(folderPath) => {
-                deleteFolder(folderPath)
-              }}
-            />
-          )
-        }
-        center={
-          isNoProjects ? (
-            <div className="flex-1 flex items-center justify-center">
-              <button
-                onClick={() => setShowNewProject(true)}
-                className="px-3 py-1 rounded-sm"
-                style={{
-                  background: 'var(--vscode-accent)',
-                  color: '#ffffff',
-                  border: '1px solid var(--vscode-panel-border)',
-                }}
-              >
-                Create new project
-              </button>
-            </div>
-          ) : (
-            <ResizableCenter
-              code={code}
-              setCode={setCode}
-              proposals={proposals}
-              clearProposal={clearProposal}
-              activeFile={activeFile}
-              onSelectFile={setActiveFile}
-              terminalLogs={''}
-              onClearLogs={() => {}}
-              isIgnored={isPathIgnored}
-              // When editor requests a code fix open modal
-              onRequestCodeFix={openCodeFix}
-            />
-          )
-        }
-        right={
           isNoProjects ? (
             <div
               className="p-4 text-sm"
@@ -673,6 +606,83 @@ function App() {
               />
               <div className="px-4 py-2 text-xs text-gray-500" />
             </>
+          )
+        }
+        center={
+          isNoProjects ? (
+            <div className="flex-1 flex items-center justify-center">
+              <button
+                onClick={() => setShowNewProject(true)}
+                className="px-3 py-1 rounded-sm"
+                style={{
+                  background: 'var(--vscode-accent)',
+                  color: '#ffffff',
+                  border: '1px solid var(--vscode-panel-border)',
+                }}
+              >
+                Create new project
+              </button>
+            </div>
+          ) : (
+            <ResizableCenter
+              code={code}
+              setCode={setCode}
+              proposals={proposals}
+              clearProposal={clearProposal}
+              activeFile={activeFile}
+              onSelectFile={setActiveFile}
+              terminalLogs={''}
+              onClearLogs={() => {}}
+              isIgnored={isPathIgnored}
+              // When editor requests a code fix open modal
+              onRequestCodeFix={openCodeFix}
+              previewUrl={previewUrl}
+              previewRefreshToken={previewRefreshToken}
+            />
+          )
+        }
+        right={
+          isNoProjects ? (
+            <div
+              className="p-4 text-sm"
+              style={{ color: 'var(--vscode-muted)' }}
+            >
+              No project. Create a new one to get started.
+            </div>
+          ) : (
+            <FileTree
+              project={projectForTree}
+              activeFile={activeFile}
+              onSelect={setActiveFile}
+              onCreateFile={(name) => {
+                createFile(name)
+              }}
+              onCreateFolder={(folderPath) => {
+                createFolder(folderPath)
+              }}
+              onRename={(oldPath, newPath) => {
+                renameFile(oldPath, newPath)
+              }}
+              onDelete={(path) => {
+                deleteFile(path)
+              }}
+              onMoveFile={(src, destDir) => {
+                moveFile(src, destDir)
+              }}
+              onMoveFolder={(srcFolder, destDir) => {
+                moveFolder(srcFolder, destDir)
+              }}
+              proposed={proposalsForTree}
+              folders={folders}
+              expandedPaths={expandedFolders}
+              onExpandedChange={setExpandedFolders}
+              onRenameFolder={(oldPath, newPath) => {
+                renameFolder(oldPath, newPath)
+              }}
+              onDeleteFolder={(folderPath) => {
+                deleteFolder(folderPath)
+              }}
+            />
           )
         }
       />

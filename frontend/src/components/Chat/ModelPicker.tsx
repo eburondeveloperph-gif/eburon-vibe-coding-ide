@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react'
 import { API_BASE } from '../../constants'
 
@@ -29,6 +31,7 @@ export const ModelPicker: React.FC<ModelPickerProps> = ({
         if (!res.ok) throw new Error(`Failed to load models (${res.status})`)
         const data: ModelsResponse = await res.json()
         const list = Array.isArray(data.models) ? data.models : []
+        console.log('Frontend received models:', list)
         if (mounted) setModels(list)
       } catch (e: unknown) {
         if (mounted) {

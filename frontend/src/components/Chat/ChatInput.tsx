@@ -1,3 +1,5 @@
+"use client";
+
 import React from 'react'
 import { Loader, Send, X } from 'lucide-react'
 

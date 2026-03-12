@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import {
   loadPersistedState,
@@ -222,7 +224,7 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
           input: '',
           loading: false,
           cancelling: false,
-          model: s?.model || 'anthropic/claude-sonnet-4.5',
+          model: s?.model || 'xai/grok-4',
           activeThreadId: null,
           templateId: inferredTemplateId,
           sandbox: {
@@ -243,7 +245,7 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
             input: '',
             loading: false,
             cancelling: false,
-            model: 'anthropic/claude-sonnet-4.5',
+            model: 'xai/grok-4',
             activeThreadId: null,
             templateId: defaultTemplateId,
             sandbox: {},
@@ -263,7 +265,7 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
         input: '',
         loading: false,
         cancelling: false,
-        model: 'anthropic/claude-sonnet-4.5',
+        model: 'xai/grok-4',
         activeThreadId: null,
         templateId: defaultTemplateId,
         sandbox: {},
@@ -272,6 +274,37 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
     } as Record<string, ProjectState>
     return initial
   })
+
+  // Sync active model with available models from API
+  React.useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/models`)
+        if (res.ok) {
+          const data = await res.json()
+          const available = Array.isArray(data.models) ? data.models : []
+          if (available.length > 0) {
+            setProjectStates((prev) => {
+              const currentModel = prev[activeProjectId]?.model
+              if (currentModel && !available.includes(currentModel)) {
+                return {
+                  ...prev,
+                  [activeProjectId]: {
+                    ...prev[activeProjectId],
+                    model: available[0],
+                  },
+                }
+              }
+              return prev
+            })
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    fetchModels()
+  }, [activeProjectId])
 
   // persist essential fields
   React.useEffect(() => {
@@ -322,7 +355,7 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
           input: '',
           loading: false,
           cancelling: false,
-          model: 'anthropic/claude-sonnet-4.5',
+          model: 'xai/grok-4',
           activeThreadId: null,
           templateId: defaultTemplateId,
           sandbox: {},
@@ -357,7 +390,7 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
       input: '',
       loading: false,
       cancelling: false,
-      model: 'anthropic/claude-sonnet-4.5',
+      model: 'xai/grok-4',
       activeThreadId: null,
       templateId: defaultTemplateId,
       sandbox: {},
@@ -1089,7 +1122,7 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({
           input: '',
           loading: false,
           cancelling: false,
-          model: 'anthropic/claude-sonnet-4.5',
+          model: 'xai/grok-4',
           activeThreadId: null,
           templateId,
           sandbox: {},
